@@ -1,7 +1,9 @@
 package com.sweityuo.delyHordes;
 
-import com.sweityuo.delyHordes.Event.*;
+import com.sweityuo.delyHordes.listeners.CustomMenuListener;
 import com.sweityuo.delyHordes.listeners.MobDeathListener;
+import com.sweityuo.delyHordes.loot.LootContoller;
+import com.sweityuo.delyHordes.loot.LootEditorMenu;
 import com.sweityuo.delyHordes.mobs.MobManager;
 import com.sweityuo.delyHordes.placeholders.MyExpansion;
 import com.sweityuo.delyHordes.utils.BossBarUtil;
@@ -13,17 +15,22 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 
 public class Main extends JavaPlugin {
-    private LootContoller lootController;
+    private static Main instance;
+
     private CustomYml lootFile;
     private MobManager mobManager;
     private MessageManager messageManager;
     private BossBarUtil bossBarUtil;
     private WavesUtil waves;
     private TopDamageUtil topDamageUtil;
+    private LootContoller lootController;
+    private LootEditorMenu lootEditorMenu;
+
 
 
     @Override
@@ -32,15 +39,23 @@ public class Main extends JavaPlugin {
         if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
             new MyExpansion(this).register();
         }
+        instance = this;
+        lootFile = new CustomYml(this, "loot.yml");
+
         topDamageUtil = new TopDamageUtil(this);
         mobManager = new MobManager(getConfig().getConfigurationSection("mobs"));
+        lootEditorMenu = new LootEditorMenu(this);
+        lootController = new LootContoller();
         waves = new WavesUtil(this, mobManager);
         lootController = new LootContoller();
         bossBarUtil = new BossBarUtil(waves, this);
         messageManager = new MessageManager(getConfig());
-        lootFile = new CustomYml(this, "loot.yml");
         getServer().getPluginManager().registerEvents(
                 new MobDeathListener(waves, this),
+                this
+        );
+        getServer().getPluginManager().registerEvents(
+                new CustomMenuListener(this),
                 this
         );
         getLogger().info("DelyHordes включён!");
@@ -52,7 +67,9 @@ public class Main extends JavaPlugin {
 
 
     }
-
+    public static Main getInstance() {
+        return instance;
+    }
 
     public TopDamageUtil getTopDamageUtil() {
         return topDamageUtil;
@@ -60,7 +77,9 @@ public class Main extends JavaPlugin {
     public MessageManager getMessageManager() {
         return messageManager;
     }
-
+    public LootEditorMenu getLootEditorMenu() {
+        return lootEditorMenu;
+    }
     public LootContoller getLootController() {
         return lootController;
     }
@@ -113,33 +132,13 @@ public class Main extends JavaPlugin {
             }
 
 
-            if(args[0].equalsIgnoreCase("addLoot")) {
+            if(args[0].equalsIgnoreCase("menu")) {
                 if (!(sender instanceof Player player)) {
                     messageManager.sendNoPermission(sender);
                     return true;
                 }
 
-                if (args.length < 2) {
-                    messageManager.sendUse(sender);
-                    return true;
-                }
-                float amount = 1;
-                try {
-                    amount = Float.parseFloat(args[1]);
-                }
-                catch (NumberFormatException e) {
-                    sender.sendMessage("Введите корректное число"); //Это не хардкод
-                }
-                lootController.addItem(player, amount, this);
-                return true;
-            }
-            if(args[0].equalsIgnoreCase("removeLoot")) {
-                if (!(sender instanceof Player player)) {
-                    messageManager.sendNoPermission(sender);
-                    return true;
-                }
-
-                lootController.removeItem(player, this);
+                lootEditorMenu.openMainMenu(player);
                 return true;
             }
 

@@ -25,7 +25,7 @@ public class MobDeathListener implements Listener {
     public void onDeath(EntityDeathEvent e) {
         if (!e.getEntity().getScoreboardTags().contains("DELY_HORDE")) return;
         e.getDrops().clear();
-        main.getLootController().spawnItem(e.getEntity().getLocation(), main);
+        main.getLootController().spawnItem(e.getEntity().getLocation());
         waves.onMobDeath((LivingEntity) e.getEntity());
 
     }

@@ -171,8 +171,7 @@ messages:
     - "§f/delyHordes start"
     - "§f/delyHordes stop"
     - "§f/delyHordes addLoot <chance>"
-    - "§f/delyHordes removeLoot"
-    - "§f/delyHordes reload"
+    - "§f/delyHordes menu"
 
   noPermission: "§cНет прав."
   stoped: "§cОрда сейчас не запущена."

@@ -31,8 +31,7 @@ public class MessageManager {
                     "§eИспользование:",
                     "§f/delyHordes start",
                     "§f/delyHordes stop",
-                    "§f/delyHordes addLoot <chance>",
-                    "§f/delyHordes removeLoot",
+                    "§f/delyHordes menu",
                     "§f/delyHordes reload"
             );
 
